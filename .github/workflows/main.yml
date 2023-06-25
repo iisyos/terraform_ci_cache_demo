@@ -30,8 +30,8 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
       - if: ${{ steps.cache-terraform.outputs.cache-hit != 'true' }}
-        name: Cache Miss
-        run: echo "Cache miss, node modules need to be installed"
+        name: No Cache
+        run: echo "No Cache"
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
