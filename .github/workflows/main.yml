@@ -32,6 +32,8 @@ jobs:
       - if: ${{ steps.cache-terraform.outputs.cache-hit != 'true' }}
         name: No Cache
         run: echo "No Cache"
+      - name: debug1
+        run: ls -a
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
