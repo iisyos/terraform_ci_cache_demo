@@ -32,10 +32,8 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
       - if: steps.cache-terraform.outputs.cache-hit != 'true'
         name: Install Terraform plugins
-        run: |
-          mkdir -p ${{ env.TF_PLUGIN_CACHE_DIR }}
-          terraform init -get-plugins=true
+        run: echo "No cached plugins to install"
       - name: Terraform Init
-        run: terraform init -plugin-dir=${{ env.TF_PLUGIN_CACHE_DIR }}
+        run: terraform init
       - name: Terraform Plan
         run: terraform plan
