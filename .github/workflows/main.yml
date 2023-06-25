@@ -4,7 +4,7 @@ on: push
 
 env:
   TF_VERSION: 1.5.1
-  TF_CHECKPOINT_DIR: '$HOME/.terraform.d'
+  TF_DIR: '.terraform.d'
 
 jobs:
   Terraform:
@@ -18,30 +18,26 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-1
-      - name: Cache Terraform plugins
-        id: cache-terraform-plugins
+      - name: Cache Terraform directories
+        id: cache-terraform
         uses: actions/cache@v3
         with:
-          path: .terraform
-          key: ${{ runner.os }}-terraform-plugins-${{ hashFiles('**/.terraform.lock.hcl') }}
+          path: |
+            ${{ env.TF_DIR }}/plugin-cache
+            ${{ env.TF_DIR }}/checkpoint_cache
+            ${{ env.TF_DIR }}/checkpoint_signature
+          key: ${{ runner.os }}-terraform-${{ hashFiles('**/.terraform.lock.hcl') }}
           restore-keys: |
-            ${{ runner.os }}-terraform-plugins-
-      - name: Cache Terraform checkpoints
-        id: cache-terraform-checkpoints
-        uses: actions/cache@v3
-        with:
-          path: ${{ env.TF_CHECKPOINT_DIR }}
-          key: ${{ runner.os }}-terraform-checkpoints-${{ hashFiles('**/.terraform.lock.hcl') }}
-          restore-keys: |
-            ${{ runner.os }}-terraform-checkpoints-
+            ${{ runner.os }}-terraform-
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: ${{ env.TF_VERSION }}
-      - if: steps.cache-terraform-plugins.outputs.cache-hit != 'true'
-        name: Install Terraform plugins
-        run: echo "No cached plugins to install"
       - name: Terraform Init
-        run: terraform init
+        run: |
+          export TF_PLUGIN_CACHE_DIR="${{ env.TF_DIR }}/plugin-cache"
+          terraform init
       - name: Terraform Plan
         run: terraform plan
+      - name: Debug
+        run: ls $HOME/.terraform.d
