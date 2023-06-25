@@ -33,10 +33,12 @@ jobs:
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: ${{ env.TF_VERSION }}
-      - name: Terraform Init
+      - name: Create directories if not exist
         run: |
+          mkdir -p "${{ env.TF_DIR }}/plugin-cache"
           export TF_PLUGIN_CACHE_DIR="${{ env.TF_DIR }}/plugin-cache"
-          terraform init
+      - name: Terraform Init
+        run: terraform init
       - name: Terraform Plan
         run: terraform plan
       - name: Debug
