@@ -31,7 +31,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ env.TF_CHECKPOINT_DIR }}
-          key: ${{ runner.os }}-terraform-checkpoints-${{ hashFiles('${{ env.TF_CHECKPOINT_DIR }}/checkpoint_cache', '${{ env.TF_CHECKPOINT_DIR }}/checkpoint_signature') }}
+          key: ${{ runner.os }}-terraform-checkpoints-${{ hashFiles('**/.terraform.lock.hcl') }}
           restore-keys: |
             ${{ runner.os }}-terraform-checkpoints-
       - name: Setup Terraform
