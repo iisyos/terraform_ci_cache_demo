@@ -17,21 +17,21 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-1
-    #   - name: Cache Tarraform
-    #     id: cache-terraform
-    #     uses: actions/cache@v3
-    #     env:
-    #       cache-name: cache-terraform
-    #     with:
-    #       path: .terraform
-    #       key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/.terraform.lock.hcl') }}
-    #       restore-keys: |
-    #         ${{ runner.os }}-build-${{ env.cache-name }}-
-    #         ${{ runner.os }}-build-
-    #         ${{ runner.os }}-
-    #   - if: ${{ steps.cache-terraform.outputs.cache-hit != 'true' }}
-    #     name: No Cache
-    #     run: echo "No Cache"
+      - name: Cache Tarraform
+        id: cache-terraform
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-terraform
+        with:
+          path: .terraform
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/.terraform.lock.hcl') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - if: ${{ steps.cache-terraform.outputs.cache-hit != 'true' }}
+        name: No Cache
+        run: echo "No Cache"
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
