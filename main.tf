@@ -5,18 +5,6 @@ terraform {
       source  = "hashicorp/aws"
       version = "3.24.1"
     }
-    google = {
-      source  = "hashicorp/google"
-      version = "3.49.0"
-    }
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "2.40.0"
-    }
-    helm = {
-      source  = "hashicorp/helm"
-      version = "2.0.3"
-    }
   }
 
   backend "s3" {
@@ -30,21 +18,18 @@ provider "aws" {
   region = "ap-northeast-1"
 }
 
-provider "google" {
-  project = "my-project"
-  region  = "us-central1"
-}
-
-provider "azurerm" {
-  features {}
-}
-
-provider "helm" {
-  kubernetes {
-    config_path = "~/.kube/config"
-  }
-}
-
-resource "random_id" "sample" {
+resource "random_id" "bucket_id" {
+  count       = 100
   byte_length = 8
+}
+
+resource "aws_s3_bucket" "bucket" {
+  count  = length(random_id.bucket_id.*.hex)
+  bucket = "bucket-${random_id.bucket_id[count.index].hex}"
+  acl    = "private"
+
+  tags = {
+    Name        = "bucket-${random_id.bucket_id[count.index].hex}"
+    Environment = "Test"
+  }
 }
