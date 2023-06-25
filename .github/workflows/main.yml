@@ -4,6 +4,7 @@ on: push
 
 env:
   TF_VERSION: 1.5.1
+  TF_PLUGIN_CACHE_DIR: '.terraform.d/plugin-cache'
 
 jobs:
   Terraform:
@@ -17,30 +18,24 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-1
-      - name: Cache Tarraform
+      - name: Cache Tarraform plugins
         id: cache-terraform
         uses: actions/cache@v3
-        env:
-          cache-name: cache-terraform
         with:
-          path: .terraform
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/.terraform.lock.hcl') }}
+          path: ${{ env.TF_PLUGIN_CACHE_DIR }}
+          key: ${{ runner.os }}-terraform-${{ hashFiles('**/.terraform.lock.hcl') }}
           restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-      - if: ${{ steps.cache-terraform.outputs.cache-hit != 'true' }}
-        name: No Cache
-        run: echo "No Cache"
-      - name: debug1
-        run: ls -a
+            ${{ runner.os }}-terraform-
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: ${{ env.TF_VERSION }}
+      - if: steps.cache-terraform.outputs.cache-hit != 'true'
+        name: Install Terraform plugins
+        run: |
+          mkdir -p ${{ env.TF_PLUGIN_CACHE_DIR }}
+          terraform init -get-plugins=true
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -plugin-dir=${{ env.TF_PLUGIN_CACHE_DIR }}
       - name: Terraform Plan
         run: terraform plan
-      - name: debug
-        run: ls -a
