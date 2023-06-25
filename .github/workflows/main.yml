@@ -22,7 +22,7 @@ jobs:
         id: cache-terraform-plugins
         uses: actions/cache@v3
         with:
-          path: ${{ env.TF_PLUGIN_CACHE_DIR }}
+          path: .terraform
           key: ${{ runner.os }}-terraform-plugins-${{ hashFiles('**/.terraform.lock.hcl') }}
           restore-keys: |
             ${{ runner.os }}-terraform-plugins-
