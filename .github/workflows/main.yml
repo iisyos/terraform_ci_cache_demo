@@ -26,8 +26,6 @@ jobs:
           key: ${{ runner.os }}-terraform-${{ hashFiles('**/.terraform.lock.hcl') }}
           restore-keys: |
             ${{ runner.os }}-terraform-
-      - name: Debug
-        run: ls $HOME/.terraform.d
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
