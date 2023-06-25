@@ -13,3 +13,11 @@ terraform {
     region = "ap-northeast-1"
   }
 }
+
+provider "aws" {
+  region = "ap-northeast-1"
+}
+
+resource "random_id" "sample" {
+  byte_length = 8
+}
